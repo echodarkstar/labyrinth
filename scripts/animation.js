@@ -12,19 +12,36 @@
 //   .enter().append("svg")
 //     .text(function(d) { return "I’m number " + d + "!"; })
 //     .attr("style","background-color:red");
-    var htmlContent="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet consectetur dolor eget interdum. Proin nec posuere enim. Maecenas hendrerit tempor dui, sed ultricies enim egestas nec. Cras ac quam nisl. Morbi eget lacus in lorem consectetur tristique vel in lectus. Cras vehicula quis tellus quis consequat. Vivamus interdum quis dolor nec rhoncus."
+    var active=1;
+    var htmlContent="<h1>Lorem ipsum dolor sit amet,</h1>"
     var circleData = [
           { "cx": 200, "cy": 200, "radius": 60, "color" : "green" },
-          { "cx": 70, "cy": 70, "radius": 60, "color" : "purple" }];
+          { "cx": 300, "cy": 300, "radius": 60, "color" : "purple" }];
         
         //Create the SVG Viewport
         var svgContainer = d3.select("body").append("svg")
-                                             .attr("width",500)
-                                             .attr("height",500);
+                                             .attr("width",800)
+                                             .attr("height",680);
                                              
         var div = d3.select("body").append("div")	
         .attr("class", "tooltip")				
         .style("opacity", 0);
+
+        var contentWindow = d3.select("body").append("div")
+        .attr("class","contentWindow")
+        // .attr("class","col-md-2")
+        .style("opacity",0)
+        .attr("id","contentWindow");
+
+        var zoom = d3.zoom()
+        .scaleExtent([1, 10])
+        .on("zoom", zoomed);
+
+        function zoomed() {
+            circles.attr("transform", d3.event.transform);
+            console.log(d3.event.transform);
+        }
+        
        
        //Add circles to the svgContainer
        var circles = svgContainer.selectAll("circle")
@@ -44,7 +61,23 @@
                                     div.transition()		
                                         		
                                         .style("opacity", 0);	
-                                });
+                                })
+                                .on("click", function(){
+                                    
+                                    if(active==1){
+                                        contentWindow.transition()
+                                        .style("opacity",1);
+                                        contentWindow.html(htmlContent)
+                                        active=0;
+                                    } else {
+                                        contentWindow.transition()
+                                    .style("opacity",0);
+                                    contentWindow.html(htmlContent)
+                                    active=1;
+                                    }
+                                    
+                                })
+                                .call(zoom);
        
        //Add the circle attributes
        var circleAttributes = circles
