@@ -28,3 +28,10 @@ div.contentWindow {
     height: 100vh;
     width: 100vw;
 } */
+
+#reset {
+    position: absolute;
+    left: 30px;
+    bottom: 30px;
+  
+}
