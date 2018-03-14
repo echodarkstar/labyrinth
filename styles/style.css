@@ -16,12 +16,15 @@ div.tooltip {
 }
 
 div.contentWindow {
+    display: none;
     float: right;
     text-align: center;
     width:20vw;
     height: 100vh;
     background-color: aqua;
     font: 14px Arial;
+    pointer-events: none;			
+    
 }
 
 /* div.svgContainer {

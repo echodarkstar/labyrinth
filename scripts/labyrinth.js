@@ -35,6 +35,9 @@ var bbox, viewBox, vx, vy, vw, vh, defaultView;
 
 var clickScale = 2.0;		// scale used when circle is clicked
 
+// class Node {
+//         constructor() 
+// }
 d3.select("#reset").on("click", reset);
 d3.tsv("circles.tsv", circletype, function(error, circles) {
   circle = container.append("g")
@@ -46,6 +49,7 @@ d3.tsv("circles.tsv", circletype, function(error, circles) {
       .attr("cx", function(d) { return d.x; })
       .attr("cy", function(d) { return d.y; })
       .style("fill", function(d) { return d.fill; })
+//       .attr("perserveAspectRatio", xMinYMid)
       .on("mouseover", function(d) {		
         div.transition()		
                     
@@ -60,23 +64,23 @@ d3.tsv("circles.tsv", circletype, function(error, circles) {
                         
                 .style("opacity", 0);	
         })
-        // .on("click", function(d){
+        .on("click.content", function(d){
                 
-        //         if(active==1){
-        //         contentWindow.transition()
-        //         .style("opacity",1);
-        //         console.log(contentWindow)
-        //         contentWindow.html(htmlContent)
-        //         active=0;
-        //         } else {
-        //         contentWindow.transition()
-        //         .style("opacity",0);
-        //         contentWindow.html(htmlContent)
-        //         active=1;
-        //         }
+                if(active==1){
+                contentWindow.transition()
+                .style("opacity",1);
+                console.log(contentWindow)
+                contentWindow.html(htmlContent)
+                active=0;
+                } else {
+                contentWindow.transition()
+                .style("opacity",0);
+                contentWindow.html(htmlContent)
+                active=1;
+                }
                 
-        // })
-        .on("click", clicked);
+        })
+        .on("click.center", clicked);
         
   bbox = container.node().getBBox();
   vx = bbox.x;		// container x co-ordinate
