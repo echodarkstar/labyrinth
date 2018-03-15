@@ -27,14 +27,29 @@ $('.filter').on('click',function() {
     var filter_fields = []
     var children = [];
     var selected_filter = $(this).val()
-    console.log(selected_filter);
+    // console.log(selected_filter);
     for (var artifact = 0; artifact < artifact_array.length; artifact++) {
         filter_fields.push(artifact_array[artifact][selected_filter])
         //Do something
     }
     // console.log(filter_fields);
     var unique_fields = filter_fields.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
-    console.log(unique_fields);
+    // console.log(unique_fields);
+    for (var name = 0; name < unique_fields.length; name++) {
+
+        var child_artifacts = []
+        for (var artifact = 0; artifact < artifact_array.length; artifact++) {
+            if (artifact_array[artifact][selected_filter] == unique_fields[name]) {
+                child_artifacts.push(artifact_array[artifact])
+            }
+        }
+        var child_json = {
+            "name" : unique_fields[name],
+            "children" : child_artifacts
+        }
+        children.push(child_json)
+    }
+    console.log(children);
 });
 
 // some colour variables
