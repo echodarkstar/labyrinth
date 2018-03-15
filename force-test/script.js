@@ -1,12 +1,7 @@
-// const firebase = require("firebase");
-// Required for side-effects
-// require("firebase/firestore");
-
 var artifact_array = []
 
 var storageRef = storage.ref();
 
-var default_load = true;
 db.collection("Artifacts")
 .get()
 .then(function(querySnapshot) {
@@ -16,73 +11,23 @@ db.collection("Artifacts")
         querySnapshot.forEach(function(doc) {
             // console.log(doc.data());
             artifact_snap = doc.data()
-            // console.log(artifact_snap)
-            
-            // console.log(artifact_snap["img-link"])
             artifact_array.push(artifact_snap);
               
-            // var artId = doc.id
         });
     }
     var filter_fields = []
     var children = [];
-    var selected_filter = "Display Status"
+    var selected_filter = "Collection";
     // console.log(selected_filter);
     for (var artifact = 0; artifact < artifact_array.length; artifact++) {
-        filter_fields.push(artifact_array[artifact][selected_filter])
-        //Do something
-    }
-    // console.log(filter_fields);
-    var unique_fields = filter_fields.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
-    // console.log(unique_fields);
-    for (var name = 0; name < unique_fields.length; name++) {
-    
-        var child_artifacts = []
-        for (var artifact = 0; artifact < artifact_array.length; artifact++) {
-            if (artifact_array[artifact][selected_filter] == unique_fields[name]) {
-                child_artifacts.push(artifact_array[artifact])
-            }
+        if (typeof(artifact_array[artifact][selected_filter]) != typeof("nan")) {
+            artifact_array[artifact][selected_filter] = "NA";
+            
         }
-        var child_json = {
-            "name" : unique_fields[name],
-            "children" : child_artifacts
-        }
-        children.push(child_json)
-    }
-    // console.log(children);
-    var artifact_json = {
-        "name": "CSMVS",
-        "img": "https://career.webindia123.com/career/institutes/aspupload/Uploads/all-states/18914/logo.jpg",
-        "children": children
-    };
-    // console.log(artifact_json);
-    createGraph(artifact_json, default_load);
-})
-.catch(function(error) {
-    console.log("Error getting documents: ", error);
-});
-
-
-
-// var artifact_json = {
-//     "name": "CSMVS",
-//     "img": "https://career.webindia123.com/career/institutes/aspupload/Uploads/all-states/18914/logo.jpg",
-//     "children": []
-// }
-
-
-$('.filter').on('click',function() {
-    // alert($(this).val());
-    default_load = false;
-    var filter_fields = []
-    var children = [];
-    var selected_filter = $(this).val()
-    // console.log(selected_filter);
-    for (var artifact = 0; artifact < artifact_array.length; artifact++) {
         filter_fields.push(artifact_array[artifact][selected_filter])
-        //Do something
     }
-    // console.log(filter_fields);
+
+    // console.log(filter_fields);    
     var unique_fields = filter_fields.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
     // console.log(unique_fields);
     for (var name = 0; name < unique_fields.length; name++) {
@@ -97,6 +42,7 @@ $('.filter').on('click',function() {
             "name" : unique_fields[name],
             "children" : child_artifacts
         }
+        // console.log(child_json)
         children.push(child_json)
     }
     // console.log(children);
@@ -107,34 +53,34 @@ $('.filter').on('click',function() {
         "children": children
     }
     // console.log(artifact_json)
-    createGraph(artifact_json, default_load);
+    createGraph(artifact_json);
+})
+.catch(function(error) {
+    console.log("Error getting documents: ", error);
 });
 
-// some colour variables
+$('#filter').change(function() {
+
+    
+});
+var maxNodeSize = 100;
 var tcBlack = "#130C0E";
 
 // rest of vars
 var w = window.innerWidth,
     h = window.innerHeight,
-    maxNodeSize = 50,
     x_browser = 20,
-    y_browser = 25,
-    root;
- 
+    y_browser = 25;
+var count = true;
+var root;
 var vis;
 var force = d3.layout.force(); 
 
 vis = d3.select("#vis").append("svg").attr("width", w).attr("height", h);
 
 function createGraph(artifact_json) {
-    // console.log(artifact_json)
-    // d3.json(artifact_json, function(json) {
-        //  console.log(json)
-        if (default_load == false) {
-            update();
-        }
          root = artifact_json;
-         console.log(root)
+        //  console.log(root)
          root.fixed = true;
          root.x = w / 2;
          root.y = h / 4;
@@ -146,21 +92,16 @@ function createGraph(artifact_json) {
         
         
          defs.enter().append("svg:path")
-             .attr("d", "M0,-5L10,0L0,5");
+             .attr("d", "M 100 350 q 150 -300 300 0");
         
             update();
-    //    });
-        
-}
 
- 
-/**
- *   
- */
 function update() {
+
+    
   var nodes = flatten(root),
       links = d3.layout.tree().links(nodes);
-    // console.log(nodes)
+    // console.log(root)
     // console.log(links)
   // Restart the force layout.
   force.nodes(nodes)
@@ -190,7 +131,10 @@ function update() {
  
   // Update the nodes…
   var node = vis.selectAll("g.node")
-      .data(nodes, function(d) { return d.id; });
+      .data(nodes, function(d) { 
+        // console.log(d.id)
+        return d.id;
+     });
  
  
   // Enter any new nodes.
@@ -202,29 +146,17 @@ function update() {
  
   // Append a circle
   nodeEnter.append("svg:circle")
-      .attr("r", function(d) { return Math.sqrt(d.size) / 10 || 4.5; })
-      .style("fill", "#eee");
-    //   .append("text")
-    //   .attr("class", "nodetext")
-    //   .attr("x", x_browser)
-    //   .attr("y", y_browser +15)
-    //   .attr("fill", tcBlack)
-    //   .text(function(d) { return d.name; });
-    //   .on( 'click', function (d) {
-    //         //   d3.select("h1").html(d.hero); 
-    //           d3.select("h2").html(d.name); 
-    //           d3.select("h3").html ("Take me to " + "<a href='" + d.link + "' >"  + d.hero + " web page ⇢"+ "</a>" ); 
-    //        });
- 
+      .attr("r", function(d) { return 25; })
+      .style("fill", "#eee"); 
    
   // Append images
   var images = nodeEnter.append("svg:image")
         .attr("xlink:href",  function(d) { 
             var fname =  d.Filename;
             // console.log(fname)
-            var imagesRef = storageRef.child('images/' + fname);
+            var imagesRef = storageRef.child('images/thumb_' + fname);
             imagesRef.getDownloadURL().then(function(url) {
-                // console.log(url)
+                console.log(url)
                 return url
 
                 }).catch(function(error) {
@@ -236,8 +168,8 @@ function update() {
         })
         .attr("x", function(d) { return -25;})
         .attr("y", function(d) { return -25;})
-        .attr("height", 50)
-        .attr("width", 50);
+        .attr("height", 100)
+        .attr("width", 100);
   
   // make the image grow a little on mouse over and add the text details on click
   var setEvents = images
@@ -282,7 +214,7 @@ function update() {
  
  
   // Re-select for update.
-  path = vis.selectAll("path.link");
+//   path = vis.selectAll("path.link");
   node = vis.selectAll("g.node");
  
 function tick() {
@@ -303,55 +235,57 @@ function tick() {
     node.attr("transform", nodeTransform);    
   }
 }
-
- 
+function nodeTransform(d) {
+    d.x =  Math.max(maxNodeSize, Math.min(w - (d.imgwidth/2 || 16), d.x));
+      d.y =  Math.max(maxNodeSize, Math.min(h - (d.imgheight/2 || 16), d.y));
+      // update();
+      
+      return "translate(" + d.x + "," + d.y + ")";
+     }
+   
+  /**
+   * Toggle children on click.
+   */ 
+  function click(d) {
+      // console.log(d.name)
+    if (d.children) {
+      d._children = d.children;
+      d.children = null;
+    } else {
+      d.children = d._children;
+      d._children = null;
+    }
+   
+    update();
+  }
+   
+   
+  /**
+   * Returns a list of all nodes under the root.
+   */ 
+  function flatten(root) {
+    var nodes = []; 
+    var i = 0;
+      
+    function recurse(node) {
+      if (node.children) 
+        node.children.forEach(recurse);
+      if (!node.id) {
+        node.id = ++i;
+      //   console.log(node.Title + " " + node.id)      
+      }
+      nodes.push(node);
+    }
+   
+    recurse(root);
+  //   update();
+  // console.log(nodes)
+    return nodes;
+  } 
+};
 /**
  * Gives the coordinates of the border for keeping the nodes inside a frame
  * http://bl.ocks.org/mbostock/1129492
  */ 
-function nodeTransform(d) {
-  d.x =  Math.max(maxNodeSize, Math.min(w - (d.imgwidth/2 || 16), d.x));
-    d.y =  Math.max(maxNodeSize, Math.min(h - (d.imgheight/2 || 16), d.y));
-    // update();
-    
-    return "translate(" + d.x + "," + d.y + ")";
-   }
- 
-/**
- * Toggle children on click.
- */ 
-function click(d) {
-    console.log(d.name)
-  if (d.children) {
-    d._children = d.children;
-    d.children = null;
-  } else {
-    d.children = d._children;
-    d._children = null;
-  }
- 
-  update();
-}
- 
- 
-/**
- * Returns a list of all nodes under the root.
- */ 
-function flatten(root) {
-  var nodes = []; 
-  var i = 0;
- 
-  function recurse(node) {
-    if (node.children) 
-      node.children.forEach(recurse);
-    if (!node.id) 
-      node.id = ++i;
-    nodes.push(node);
-  }
- 
-  recurse(root);
-//   update();
-// console.log(nodes)
-  return nodes;
-} 
-  
+
+
