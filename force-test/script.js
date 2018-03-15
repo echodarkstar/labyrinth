@@ -1,3 +1,24 @@
+// const firebase = require("firebase");
+// Required for side-effects
+// require("firebase/firestore");
+
+db.collection("Artifacts")
+.get()
+.then(function(querySnapshot) {
+    if (querySnapshot.exists) {
+        querySnapshot.forEach(function(doc) {
+            console.log(doc.id, " => ", doc.data());
+            var artData = doc.data()
+            var artId = doc.id
+        });
+    } else {
+        console.log("Do Not Exist In DB");
+    };
+})
+.catch(function(error) {
+    console.log("Error getting documents: ", error);
+});
+
 // some colour variables
 var tcBlack = "#130C0E";
 
