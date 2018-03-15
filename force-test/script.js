@@ -2,21 +2,39 @@
 // Required for side-effects
 // require("firebase/firestore");
 
+var artifact_array = []
 db.collection("Artifacts")
 .get()
 .then(function(querySnapshot) {
-    if (querySnapshot.exists) {
-        querySnapshot.forEach(function(doc) {
-            console.log(doc.id, " => ", doc.data());
-            var artData = doc.data()
-            var artId = doc.id
-        });
+    if (querySnapshot.empty) {
+        console.log('no documents found');
     } else {
-        console.log("Do Not Exist In DB");
-    };
+        querySnapshot.forEach(function(doc) {
+            // console.log(doc.data());
+            artifact_array.push(doc.data());
+            // var artId = doc.id
+        });
+    }
 })
 .catch(function(error) {
     console.log("Error getting documents: ", error);
+});
+
+
+
+$('.filter').on('click',function() {
+    // alert($(this).val());
+    var filter_fields = []
+    var children = [];
+    var selected_filter = $(this).val()
+    console.log(selected_filter);
+    for (var artifact = 0; artifact < artifact_array.length; artifact++) {
+        filter_fields.push(artifact_array[artifact][selected_filter])
+        //Do something
+    }
+    // console.log(filter_fields);
+    var unique_fields = filter_fields.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
+    console.log(unique_fields);
 });
 
 // some colour variables
