@@ -3,6 +3,10 @@
 // require("firebase/firestore");
 
 var artifact_array = []
+
+var storageRef = storage.ref();
+
+var default_load = true;
 db.collection("Artifacts")
 .get()
 .then(function(querySnapshot) {
@@ -11,10 +15,48 @@ db.collection("Artifacts")
     } else {
         querySnapshot.forEach(function(doc) {
             // console.log(doc.data());
-            artifact_array.push(doc.data());
+            artifact_snap = doc.data()
+            // console.log(artifact_snap)
+            
+            // console.log(artifact_snap["img-link"])
+            artifact_array.push(artifact_snap);
+              
             // var artId = doc.id
         });
     }
+    var filter_fields = []
+    var children = [];
+    var selected_filter = "Display Status"
+    // console.log(selected_filter);
+    for (var artifact = 0; artifact < artifact_array.length; artifact++) {
+        filter_fields.push(artifact_array[artifact][selected_filter])
+        //Do something
+    }
+    // console.log(filter_fields);
+    var unique_fields = filter_fields.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
+    // console.log(unique_fields);
+    for (var name = 0; name < unique_fields.length; name++) {
+    
+        var child_artifacts = []
+        for (var artifact = 0; artifact < artifact_array.length; artifact++) {
+            if (artifact_array[artifact][selected_filter] == unique_fields[name]) {
+                child_artifacts.push(artifact_array[artifact])
+            }
+        }
+        var child_json = {
+            "name" : unique_fields[name],
+            "children" : child_artifacts
+        }
+        children.push(child_json)
+    }
+    // console.log(children);
+    var artifact_json = {
+        "name": "CSMVS",
+        "img": "https://career.webindia123.com/career/institutes/aspupload/Uploads/all-states/18914/logo.jpg",
+        "children": children
+    };
+    // console.log(artifact_json);
+    createGraph(artifact_json, default_load);
 })
 .catch(function(error) {
     console.log("Error getting documents: ", error);
@@ -22,8 +64,16 @@ db.collection("Artifacts")
 
 
 
+// var artifact_json = {
+//     "name": "CSMVS",
+//     "img": "https://career.webindia123.com/career/institutes/aspupload/Uploads/all-states/18914/logo.jpg",
+//     "children": []
+// }
+
+
 $('.filter').on('click',function() {
     // alert($(this).val());
+    default_load = false;
     var filter_fields = []
     var children = [];
     var selected_filter = $(this).val()
@@ -49,7 +99,15 @@ $('.filter').on('click',function() {
         }
         children.push(child_json)
     }
-    console.log(children);
+    // console.log(children);
+    var artifact_json = {
+        // "_children": null,
+        "name": "CSMVS",
+        "img": "https://career.webindia123.com/career/institutes/aspupload/Uploads/all-states/18914/logo.jpg",
+        "children": children
+    }
+    // console.log(artifact_json)
+    createGraph(artifact_json, default_load);
 });
 
 // some colour variables
@@ -67,26 +125,34 @@ var vis;
 var force = d3.layout.force(); 
 
 vis = d3.select("#vis").append("svg").attr("width", w).attr("height", h);
- 
-d3.json("marvel.json", function(json) {
- 
-  root = json;
-  root.fixed = true;
-  root.x = w / 2;
-  root.y = h / 4;
- 
- 
-        // Build the path
-  var defs = vis.insert("svg:defs")
-      .data(["end"]);
- 
- 
-  defs.enter().append("svg:path")
-      .attr("d", "M0,-5L10,0L0,5");
- 
-     update();
-});
- 
+
+function createGraph(artifact_json) {
+    // console.log(artifact_json)
+    // d3.json(artifact_json, function(json) {
+        //  console.log(json)
+        if (default_load == false) {
+            update();
+        }
+         root = artifact_json;
+         console.log(root)
+         root.fixed = true;
+         root.x = w / 2;
+         root.y = h / 4;
+        
+        
+               // Build the path
+         var defs = vis.insert("svg:defs")
+             .data(["end"]);
+        
+        
+         defs.enter().append("svg:path")
+             .attr("d", "M0,-5L10,0L0,5");
+        
+            update();
+    //    });
+        
+}
+
  
 /**
  *   
@@ -94,7 +160,8 @@ d3.json("marvel.json", function(json) {
 function update() {
   var nodes = flatten(root),
       links = d3.layout.tree().links(nodes);
- 
+    // console.log(nodes)
+    // console.log(links)
   // Restart the force layout.
   force.nodes(nodes)
         .links(links)
@@ -152,7 +219,21 @@ function update() {
    
   // Append images
   var images = nodeEnter.append("svg:image")
-        .attr("xlink:href",  function(d) { return d.img;})
+        .attr("xlink:href",  function(d) { 
+            var fname =  d.Filename;
+            // console.log(fname)
+            var imagesRef = storageRef.child('images/' + fname);
+            imagesRef.getDownloadURL().then(function(url) {
+                // console.log(url)
+                return url
+
+                }).catch(function(error) {
+                return "https://agilitytoday.com/img/thumb_image_not_available.png"
+                // console.log(error)
+                // Handle any errors
+                });
+            
+        })
         .attr("x", function(d) { return -25;})
         .attr("y", function(d) { return -25;})
         .attr("height", 50)
@@ -164,7 +245,7 @@ function update() {
           .on( 'click', function (d) {
               d3.select("img").attr("src",d.img); 
               d3.select("h1").html(d.hero); 
-              d3.select("h2").html(d.name); 
+              d3.select("h2").html(d.Title); 
               d3.select("h3").html ("Take me to " + "<a href='" + d.link + "' >"  + d.hero + " web page ⇢"+ "</a>" ); 
            })
 
@@ -193,7 +274,7 @@ function update() {
       .attr("x", x_browser)
       .attr("y", y_browser +15)
       .attr("fill", tcBlack)
-      .text(function(d) { return d.hero; });
+      .text(function(d) { return d.Title; });
  
  
   // Exit any old nodes.
@@ -231,6 +312,8 @@ function tick() {
 function nodeTransform(d) {
   d.x =  Math.max(maxNodeSize, Math.min(w - (d.imgwidth/2 || 16), d.x));
     d.y =  Math.max(maxNodeSize, Math.min(h - (d.imgheight/2 || 16), d.y));
+    // update();
+    
     return "translate(" + d.x + "," + d.y + ")";
    }
  
@@ -267,6 +350,8 @@ function flatten(root) {
   }
  
   recurse(root);
+//   update();
+// console.log(nodes)
   return nodes;
 } 
   
