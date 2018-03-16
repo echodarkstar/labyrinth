@@ -75,15 +75,21 @@ var count = true;
 var root;
 var vis;
 var force = d3.layout.force(); 
+// console.log(w,h);
 
-vis = d3.select("#vis").append("svg").attr("width", w).attr("height", h);
+vis = d3.select("body").append("svg").attr("width", w).attr("height", h)
+.attr("overflow","visible")
+.call(d3.behavior.zoom().on("zoom", function () {
+    vis.attr("transform"," scale(" + d3.event.scale + ")")
+  }));
+// console.log(vis);
 
 function createGraph(artifact_json) {
          root = artifact_json;
         //  console.log(root)
          root.fixed = true;
          root.x = w / 2;
-         root.y = h / 4;
+         root.y = h / 2;
         
         
                // Build the path
@@ -142,11 +148,12 @@ function update() {
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
       .on("click", click)
-      .call(force.drag);
+      .call(force.drag)
+      
  
   // Append a circle
   nodeEnter.append("svg:circle")
-      .attr("r", function(d) { return 25; })
+      .attr("r", function(d) { return 10; })
       .style("fill", "#eee"); 
    
   // Append images
@@ -156,8 +163,8 @@ function update() {
             // console.log(fname)
             var imagesRef = storageRef.child('images/thumb_' + fname);
             imagesRef.getDownloadURL().then(function(url) {
-                console.log(url)
-                return url
+                // console.log(url)
+                return String(url)
 
                 }).catch(function(error) {
                 return "https://agilitytoday.com/img/thumb_image_not_available.png"
@@ -236,9 +243,9 @@ function tick() {
   }
 }
 function nodeTransform(d) {
-    d.x =  Math.max(maxNodeSize, Math.min(w - (d.imgwidth/2 || 16), d.x));
-      d.y =  Math.max(maxNodeSize, Math.min(h - (d.imgheight/2 || 16), d.y));
-      // update();
+    // d.x =  Math.max(maxNodeSize, Math.min(w - (d.imgwidth/2 || 16), d.x));
+    //   d.y =  Math.max(maxNodeSize, Math.min(h - (d.imgheight/2 || 16), d.y));
+      update();
       
       return "translate(" + d.x + "," + d.y + ")";
      }

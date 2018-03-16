@@ -10,7 +10,7 @@ path.link {
 
 h1 { font-size: 36px; margin: 10px 0; text-transform: uppercase; font-weight: normal;}
 h2, h3 { font-size: 18px; margin: 5px 0 ; font-weight: normal;}
-header {padding: 20px; position: absolute; top: 0; left: 0;}
+header {padding: 20px; position: absolute; top: 0; left: 0; z-index: 5}
 a:link { color: #EE3124; text-decoration: none;}
 a:visited { color: #EE3124; }
 a:hover { color: #A4CD39; text-decoration: underline;}
