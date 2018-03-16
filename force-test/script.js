@@ -73,6 +73,7 @@ var w = window.innerWidth,
     y_browser = 25;
 var count = true;
 var root;
+var centered;
 var vis;
 var force = d3.layout.force(); 
 // console.log(w,h);
@@ -145,10 +146,12 @@ function update() {
  
   // Enter any new nodes.
   var nodeEnter = node.enter().append("svg:g")
-      .attr("class", "node")
+      .attr("class", "node active")
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-      .on("click", click)
-      .call(force.drag)
+      .on("click.enter", click)
+      .on("click.center", clicked)
+      .call(force.drag);
+      
       
  
   // Append a circle
@@ -158,21 +161,21 @@ function update() {
    
   // Append images
   var images = nodeEnter.append("svg:image")
-        .attr("xlink:href",  function(d) { 
-            var fname =  d.Filename;
-            // console.log(fname)
-            var imagesRef = storageRef.child('images/thumb_' + fname);
-            imagesRef.getDownloadURL().then(function(url) {
-                // console.log(url)
-                return String(url)
+        // .attr("xlink:href",  function(d) { 
+        //     var fname =  d.Filename;
+        //     // console.log(fname)
+        //     var imagesRef = storageRef.child('images/thumb_' + fname);
+        //     imagesRef.getDownloadURL().then(function(url) {
+        //         // console.log(url)
+        //         return String(url)
 
-                }).catch(function(error) {
-                return "https://agilitytoday.com/img/thumb_image_not_available.png"
-                // console.log(error)
-                // Handle any errors
-                });
+        //         }).catch(function(error) {
+        //         return "https://agilitytoday.com/img/thumb_image_not_available.png"
+        //         // console.log(error)
+        //         // Handle any errors
+        //         });
             
-        })
+        // })
         .attr("x", function(d) { return -25;})
         .attr("y", function(d) { return -25;})
         .attr("height", 100)
@@ -221,7 +224,7 @@ function update() {
  
  
   // Re-select for update.
-//   path = vis.selectAll("path.link");
+  path = vis.selectAll("path.link");
   node = vis.selectAll("g.node");
  
 function tick() {
@@ -241,7 +244,36 @@ function tick() {
   });
     node.attr("transform", nodeTransform);    
   }
+
+
 }
+function clicked(d) {
+    var x, y, k;
+  
+    if (d && centered !== d) {
+      x = d3.event.x;
+      y = d3.event.y;
+      k = 4;
+      centered = d;
+    } else {
+      x = w/2;
+      y = h/2;
+      k = 1;
+      console.log("hi");
+      centered = null;
+    }
+    console.log(x,y,centered)
+    // console.log(d);
+  
+    vis.selectAll("g.node")
+        .classed("active", centered && function(d) { return d === centered; });
+  
+    vis.transition()
+        .duration(750)
+        .attr("transform", "translate(" + w/2 + "," + h/2+ ") scale(" + 1+ ")translate(" + -x + "," + -y + ")")
+        // .style("stroke-width", 1.5 / k + "px");
+        update();
+  }
 function nodeTransform(d) {
     // d.x =  Math.max(maxNodeSize, Math.min(w - (d.imgwidth/2 || 16), d.x));
     //   d.y =  Math.max(maxNodeSize, Math.min(h - (d.imgheight/2 || 16), d.y));
@@ -265,7 +297,7 @@ function nodeTransform(d) {
    
     update();
   }
-   
+
    
   /**
    * Returns a list of all nodes under the root.

@@ -8,6 +8,10 @@ path.link {
   display: none;
 }
 
+.active {
+  fill: blue;
+}
+
 h1 { font-size: 36px; margin: 10px 0; text-transform: uppercase; font-weight: normal;}
 h2, h3 { font-size: 18px; margin: 5px 0 ; font-weight: normal;}
 header {padding: 20px; position: absolute; top: 0; left: 0; z-index: 5}
