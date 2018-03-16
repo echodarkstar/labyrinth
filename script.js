@@ -161,34 +161,20 @@ function update() {
    
   // Append images
   var images = nodeEnter.append("svg:image")
-        // .attr("xlink:href",  function(d) { 
-        //     var fname =  d.Filename;
-        //     // console.log(fname)
-        //     var imagesRef = storageRef.child('images/thumb_' + fname);
-        //     imagesRef.getDownloadURL().then(function(url) {
-        //         // console.log(url)
-        //         return String(url)
-
-        //         }).catch(function(error) {
-        //         return "https://agilitytoday.com/img/thumb_image_not_available.png"
-        //         // console.log(error)
-        //         // Handle any errors
-        //         });
-            
-        // })
+        .attr("xlink:href", function(d) { return d["img-thumb"]; })
         .attr("x", function(d) { return -25;})
         .attr("y", function(d) { return -25;})
-        .attr("height", 100)
-        .attr("width", 100);
+        .attr("height", 50)
+        .attr("width", 50);
   
   // make the image grow a little on mouse over and add the text details on click
   var setEvents = images
           // Append hero text
           .on( 'click', function (d) {
-              d3.select("img").attr("src",d.img); 
-              d3.select("h1").html(d.hero); 
-              d3.select("h2").html(d.Title); 
-              d3.select("h3").html ("Take me to " + "<a href='" + d.link + "' >"  + d.hero + " web page ⇢"+ "</a>" ); 
+              d3.select("img").attr("src",d["img-thumb"]); 
+              d3.select("h1").html(d.Title); 
+              d3.select("h2").html(d["Long Description"]).style("width",w/5).style("overflow","scroll"); 
+              d3.select("h3").html ("Read more - " + "<a href='" + "https://en.wikipedia.org/wiki/" + d["wiki-title"].replace(/ /g,"_") + "' >" + d["wiki-title"] + "</a>"  ); 
            })
 
           .on( 'mouseenter', function() {
@@ -259,10 +245,10 @@ function clicked(d) {
       x = w/2;
       y = h/2;
       k = 1;
-      console.log("hi");
+    //   console.log("hi");
       centered = null;
     }
-    console.log(x,y,centered)
+    // console.log(x,y,centered)
     // console.log(d);
   
     vis.selectAll("g.node")
