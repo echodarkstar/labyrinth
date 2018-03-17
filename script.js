@@ -172,7 +172,8 @@ function update() {
           // Append hero text
           .on( 'click', function (d) {
               d3.select("#content").style("display","block");
-              d3.select("#artifact-image").attr("src",d["img-thumb"]); 
+              d3.select("#artifact-thumb-image").attr("src",d["img-thumb"]);
+              d3.select("#artifact-full-image").attr("src",d["img-storage"]);
               d3.select("#artifact-title").html(d.Title);
               d3.select("#artifact-provenance").html(d.Provenance);
               d3.select("#artifact-period").html(d.Period); 
@@ -180,8 +181,27 @@ function update() {
               d3.select("#artifact-display-status").html(d["Display Status"]);
               d3.select("#artifact-long-description").html(d["Long Description"]); 
               d3.select("#artifact-link").attr("href","https://en.wikipedia.org/wiki/" + d["wiki-title"].replace(/ /g,"_"))
-                                        .html("Read More"); 
+                .html("Read More"); 
+            $.ajax({
+                url: "https://rabbit-hole-backend.herokuapp.com/adjacent",
+                type: "post",
+                data: JSON.stringify({"title": d["wiki-title"]}) ,
+                contentType: 'application/json',
+                success: function (response) {
+                    console.log(response)
+                    // you will get response from your php page (what you echo or print)                 
+        
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log(textStatus, errorThrown);
+                }
+        
+        
+            });
            })
+
+           
+
 
           .on( 'mouseenter', function() {
             // select element in current context
@@ -318,5 +338,9 @@ function nodeTransform(d) {
  * Gives the coordinates of the border for keeping the nodes inside a frame
  * http://bl.ocks.org/mbostock/1129492
  */ 
+document.getElementById("close-button").addEventListener("click",function() {
+    document.getElementById("content").style.display="none";
+});
 
+    
 
