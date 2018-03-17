@@ -20,11 +20,11 @@ db.collection("Artifacts")
 .catch(function(error) {
     console.log("Error getting documents: ", error);
 });
-
+var selected_filter;
 $('#filter').change(function() {
     var filter_fields = []
     var children = [];
-    var selected_filter = $(this).val();
+    selected_filter = $(this).val();
     // console.log(selected_filter);
     for (var artifact = 0; artifact < artifact_array.length; artifact++) {
         if (typeof(artifact_array[artifact][selected_filter]) != typeof("nan")) {
@@ -201,9 +201,11 @@ function update() {
                     }
                 });  
         $(document).ajaxComplete(function(){
+            console.log("query done");
             for (var newn =0; newn< root["children"].length; newn++) {
                 // console.log(root["children"][newn])
-                if (root["children"][newn]["name"] == d.Collection){
+                if (root["children"][newn]["name"] == d[selected_filter]){
+                    // console.log(root["children"][newn]);
                     for (var newn2 =0; newn2 < root["children"][newn]["children"].length; newn2++) {
                         if (root["children"][newn]["children"][newn2]["Title"] == d.Title) {
                             // console.log(root["children"][newn]["children"][newn2]);
@@ -214,10 +216,11 @@ function update() {
                             for (var prop in data) {
                                 new_children.push({"Title":prop, "img-thumb":data[prop]});
                             }
+                            // console.log(new_children);
                             // console.log(newn)
                             // console.log(root["children"][newn])
                             root["children"][newn]["children"][newn2].children = new_children;
-                            console.log(nodes)
+                            // console.log(nodes)
                             // root["children"][newn]["children"][newn2]["name"].children = [{"key":"value"}]
                             // console.log(root["children"][newn]["children"][newn2]);
                             // console.log(root)
