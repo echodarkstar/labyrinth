@@ -15,9 +15,16 @@ db.collection("Artifacts")
               
         });
     }
+    
+})
+.catch(function(error) {
+    console.log("Error getting documents: ", error);
+});
+
+$('#filter').change(function() {
     var filter_fields = []
     var children = [];
-    var selected_filter = "Collection";
+    var selected_filter = $(this).val();
     // console.log(selected_filter);
     for (var artifact = 0; artifact < artifact_array.length; artifact++) {
         if (typeof(artifact_array[artifact][selected_filter]) != typeof("nan")) {
@@ -54,15 +61,10 @@ db.collection("Artifacts")
     }
     // console.log(artifact_json)
     createGraph(artifact_json);
-})
-.catch(function(error) {
-    console.log("Error getting documents: ", error);
-});
-
-$('#filter').change(function() {
-
     
 });
+var i = 0;
+
 var maxNodeSize = 100;
 var tcBlack = "#130C0E";
 
@@ -87,7 +89,6 @@ vis = d3.select("body").append("svg").attr("width", w).attr("height", h)
 
 function createGraph(artifact_json) {
          root = artifact_json;
-        //  console.log(root)
          root.fixed = true;
          root.x = w / 2;
          root.y = h / 2;
@@ -181,24 +182,54 @@ function update() {
               d3.select("#artifact-display-status").html(d["Display Status"]);
               d3.select("#artifact-long-description").html(d["Long Description"]); 
               d3.select("#artifact-link").attr("href","https://en.wikipedia.org/wiki/" + d["wiki-title"].replace(/ /g,"_"))
-                .html("Read More"); 
-            $.ajax({
-                url: "https://rabbit-hole-backend.herokuapp.com/adjacent",
-                type: "post",
-                data: JSON.stringify({"title": d["wiki-title"]}) ,
-                contentType: 'application/json',
-                success: function (response) {
-                    console.log(response)
-                    // you will get response from your php page (what you echo or print)                 
-        
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.log(textStatus, errorThrown);
+                .html("Read More");
+                var adjacent_data = $.ajax({
+                    url: "https://rabbit-hole-backend.herokuapp.com/adjacent",
+                    type: "post",
+                    data: JSON.stringify({"title": d["wiki-title"]}) ,
+                    contentType: 'application/json',
+                    success: function (response) {
+                        // var new_children = []
+                        return response
+                        // jsObject = JSON.parse(response);
+                        
+                        // you will get response from your php page (what you echo or print)                 
+            
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log(textStatus, errorThrown);
+                    }
+                });  
+        $(document).ajaxComplete(function(){
+            for (var newn =0; newn< root["children"].length; newn++) {
+                // console.log(root["children"][newn])
+                if (root["children"][newn]["name"] == d.Collection){
+                    for (var newn2 =0; newn2 < root["children"][newn]["children"].length; newn2++) {
+                        if (root["children"][newn]["children"][newn2]["Title"] == d.Title) {
+                            // console.log(root["children"][newn]["children"][newn2]);
+                            root["children"][newn]["children"][newn2].name = root["children"][newn]["children"][newn2]["Title"]; 
+                            // console.log(adjacent_data.responseJSON);
+                            data = adjacent_data.responseJSON
+                            new_children = []
+                            for (var prop in data) {
+                                new_children.push({"Title":prop, "img-thumb":data[prop]});
+                            }
+                            // console.log(newn)
+                            // console.log(root["children"][newn])
+                            root["children"][newn]["children"][newn2].children = new_children;
+                            console.log(nodes)
+                            // root["children"][newn]["children"][newn2]["name"].children = [{"key":"value"}]
+                            // console.log(root["children"][newn]["children"][newn2]);
+                            // console.log(root)
+                        }
+                    }
                 }
-        
-        
-            });
-           })
+            } 
+                
+            
+           });
+
+        })
 
            
 
@@ -316,7 +347,6 @@ function nodeTransform(d) {
    */ 
   function flatten(root) {
     var nodes = []; 
-    var i = 0;
       
     function recurse(node) {
       if (node.children) 
