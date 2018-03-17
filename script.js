@@ -171,10 +171,16 @@ function update() {
   var setEvents = images
           // Append hero text
           .on( 'click', function (d) {
-              d3.select("img").attr("src",d["img-thumb"]); 
-              d3.select("h1").html(d.Title); 
-              d3.select("h2").html(d["Long Description"]).style("width",w/5).style("overflow","scroll"); 
-              d3.select("h3").html ("Read more - " + "<a href='" + "https://en.wikipedia.org/wiki/" + d["wiki-title"].replace(/ /g,"_") + "' >" + d["wiki-title"] + "</a>"  ); 
+              d3.select("#content").style("display","block");
+              d3.select("#artifact-image").attr("src",d["img-thumb"]); 
+              d3.select("#artifact-title").html(d.Title);
+              d3.select("#artifact-provenance").html(d.Provenance);
+              d3.select("#artifact-period").html(d.Period); 
+              d3.select("#artifact-short-description").html(d["Short Description"]);
+              d3.select("#artifact-display-status").html(d["Display Status"]);
+              d3.select("#artifact-long-description").html(d["Long Description"]); 
+              d3.select("#artifact-link").attr("href","https://en.wikipedia.org/wiki/" + d["wiki-title"].replace(/ /g,"_"))
+                                        .html("Read More"); 
            })
 
           .on( 'mouseenter', function() {

@@ -25,12 +25,75 @@
     <!-- container for force layout visualisation  -->
     <section id="vis"></section>
     
-    <header id="content">
+    <!-- <header id="content">
         <img>
         <h1>Labyrinth</h1>
         <h2>Click to view their identity</h2>
         <h3>And link to their web page!</h3>
-    </header>
+    </header> -->
+
+    <div class="card" style="width: 18rem;" id="content">
+        <img class="card-img-top" id="artifact-image" alt="Card image cap">
+        <div class="card-body">
+          <h5 class="card-title" id="artifact-title">Card title</h5>
+          <!-- <p class="card-text" id="artifact-short-desciption"></p> -->
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                  <h5 class="card-title">Short Description</h5>
+                  <!-- <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6> -->
+                  <p class="card-text" id="artifact-short-description"></p>
+                </div>
+              </div>
+          </li>
+          <li class="list-group-item">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">Long Description</h5>
+                        <p class="card-text" id="artifact-long-description"></p>
+                    </div>
+                </div>
+          </li>
+          <li class="list-group-item">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">Provenance</h5>
+                        <p class="card-text" id="artifact-provenance"></p>
+                    </div>
+                </div>
+          </li>
+          <li class="list-group-item">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">Display Status</h5>
+                        <p class="card-text" id="artifact-display-status"></p>
+                    </div>
+                </div>
+          </li>
+          <li class="list-group-item">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">Period</h5>
+                        <p class="card-text" id="artifact-period"></p>
+                    </div>
+                </div>
+          </li>
+          <!-- <li class="list-group-item">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">Collection</h5>
+                        <p class="card-text" id="artifact-collection"></p>
+                    </div>
+                </div>
+          </li> -->
+        </ul>
+        <div class="card-body">
+          <!-- <a href="#" class="card-link" id="">Card link</a> -->
+          <a href="#" class="card-link" id="artifact-link"></a>
+        </div>
+      </div>
 
     <script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.11.0/firebase-firestore.js"></script>
