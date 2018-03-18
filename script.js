@@ -447,3 +447,7 @@ function createCard(ctag, ccontent) {
     // d3.select("#content").append("div").attr("class", "card-body") 
     //                      .append("a").attr("class", "href-link").attr("href", clink)              
 }
+
+$(window).on('load',function(){
+    $('#myModal').modal('show');
+});
