@@ -11,58 +11,61 @@ db.collection("Artifacts")
         querySnapshot.forEach(function(doc) {
             // console.log(doc.data());
             artifact_snap = doc.data()
+            artifact_snap["fid"] = doc.id
             artifact_array.push(artifact_snap);
               
         });
     }
+    $('#filter').change(function() {
+        var filter_fields = []
+        var children = [];
+        selected_filter = $(this).val();
+        // console.log(selected_filter);
+        for (var artifact = 0; artifact < artifact_array.length; artifact++) {
+            if (typeof(artifact_array[artifact][selected_filter]) != typeof("nan")) {
+                artifact_array[artifact][selected_filter] = "NA";
+                
+            }
+            filter_fields.push(artifact_array[artifact][selected_filter])
+        }
     
+        // console.log(filter_fields);    
+        var unique_fields = filter_fields.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
+        // console.log(unique_fields);
+        for (var name = 0; name < unique_fields.length; name++) {
+    
+            var child_artifacts = []
+            for (var artifact = 0; artifact < artifact_array.length; artifact++) {
+                if (artifact_array[artifact][selected_filter] == unique_fields[name]) {
+                    child_artifacts.push(artifact_array[artifact])
+                }
+            }
+            var child_json = {
+                "name" : unique_fields[name],
+                "children" : child_artifacts,
+                "parent" : "CSMVS"
+            }
+            // console.log(child_json)
+            children.push(child_json)
+        }
+        // console.log(children);
+        var artifact_json = {
+            // "_children": null,
+            "name": "CSMVS",
+            "img-thumb": "https://career.webindia123.com/career/institutes/aspupload/Uploads/all-states/18914/logo.jpg",
+            "children": children
+        }
+        // console.log(artifact_json)
+        createGraph(artifact_json);
+        
+    });
+    
+    // $('#filter').value = "Collection"
 })
 .catch(function(error) {
     console.log("Error getting documents: ", error);
 });
 var selected_filter;
-$('#filter').change(function() {
-    var filter_fields = []
-    var children = [];
-    selected_filter = $(this).val();
-    // console.log(selected_filter);
-    for (var artifact = 0; artifact < artifact_array.length; artifact++) {
-        if (typeof(artifact_array[artifact][selected_filter]) != typeof("nan")) {
-            artifact_array[artifact][selected_filter] = "NA";
-            
-        }
-        filter_fields.push(artifact_array[artifact][selected_filter])
-    }
-
-    // console.log(filter_fields);    
-    var unique_fields = filter_fields.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
-    // console.log(unique_fields);
-    for (var name = 0; name < unique_fields.length; name++) {
-
-        var child_artifacts = []
-        for (var artifact = 0; artifact < artifact_array.length; artifact++) {
-            if (artifact_array[artifact][selected_filter] == unique_fields[name]) {
-                child_artifacts.push(artifact_array[artifact])
-            }
-        }
-        var child_json = {
-            "name" : unique_fields[name],
-            "children" : child_artifacts
-        }
-        // console.log(child_json)
-        children.push(child_json)
-    }
-    // console.log(children);
-    var artifact_json = {
-        // "_children": null,
-        "name": "CSMVS",
-        "img": "https://career.webindia123.com/career/institutes/aspupload/Uploads/all-states/18914/logo.jpg",
-        "children": children
-    }
-    // console.log(artifact_json)
-    createGraph(artifact_json);
-    
-});
 var i = 0;
 
 var maxNodeSize = 100;
@@ -76,16 +79,15 @@ var w = window.innerWidth,
 var count = true;
 var root;
 var centered;
-var vis;
 var force = d3.layout.force(); 
 // console.log(w,h);
 
-vis = d3.select("body").append("svg").attr("width", w).attr("height", h)
-.attr("overflow","visible")
-.call(d3.behavior.zoom().on("zoom", function () {
-    vis.attr("transform"," scale(" + d3.event.scale + ")")
-  }));
-// console.log(vis);
+ var svg = d3.select("body").append("svg").attr("width", w).attr("height", h).call(d3.behavior.zoom().scaleExtent([0.5,5]).on("zoom", function () {
+    vis.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
+  }))
+
+ var vis = svg.append("svg:g")
+                .attr("overflow","visible")
 
 function createGraph(artifact_json) {
          root = artifact_json;
@@ -109,12 +111,12 @@ function update() {
     
   var nodes = flatten(root),
       links = d3.layout.tree().links(nodes);
-    // console.log(root)
+    // console.log(nodes);
     // console.log(links)
   // Restart the force layout.
   force.nodes(nodes)
         .links(links)
-        .gravity(0.05)
+        // .gravity(0.05)
     .charge(-1500)
     .linkDistance(100)
     .friction(0.5)
@@ -166,12 +168,14 @@ function update() {
         .attr("x", function(d) { return -25;})
         .attr("y", function(d) { return -25;})
         .attr("height", 50)
-        .attr("width", 50);
+        .attr("width", 50)
+        .style("z-index", function(d) { if (d.name=="CSMVS") { return 5 }});
   
   // make the image grow a little on mouse over and add the text details on click
   var setEvents = images
           // Append hero text
           .on( 'click', function (d) {
+
               d3.select("#content").style("display","block");
               d3.select("#artifact-thumb-image").attr("src",d["img-thumb"]);
               d3.select("#artifact-full-image").attr("src",d["img-storage"]);
@@ -181,62 +185,11 @@ function update() {
               d3.select("#artifact-short-description").html(d["Short Description"]);
               d3.select("#artifact-display-status").html(d["Display Status"]);
               d3.select("#artifact-long-description").html(d["Long Description"]); 
-              d3.select("#artifact-link").attr("href","https://en.wikipedia.org/wiki/" + d["wiki-title"].replace(/ /g,"_"))
-                .html("Read More");
-                var adjacent_data = $.ajax({
-                    url: "https://rabbit-hole-backend.herokuapp.com/adjacent",
-                    type: "post",
-                    data: JSON.stringify({"title": d["wiki-title"]}) ,
-                    contentType: 'application/json',
-                    success: function (response) {
-                        // var new_children = []
-                        return response
-                        // jsObject = JSON.parse(response);
-                        
-                        // you will get response from your php page (what you echo or print)                 
-            
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.log(textStatus, errorThrown);
-                    }
-                });  
-        $(document).ajaxComplete(function(){
-            console.log("query done");
-            for (var newn =0; newn< root["children"].length; newn++) {
-                // console.log(root["children"][newn])
-                if (root["children"][newn]["name"] == d[selected_filter]){
-                    // console.log(root["children"][newn]);
-                    for (var newn2 =0; newn2 < root["children"][newn]["children"].length; newn2++) {
-                        if (root["children"][newn]["children"][newn2]["Title"] == d.Title) {
-                            // console.log(root["children"][newn]["children"][newn2]);
-                            root["children"][newn]["children"][newn2].name = root["children"][newn]["children"][newn2]["Title"]; 
-                            // console.log(adjacent_data.responseJSON);
-                            data = adjacent_data.responseJSON
-                            new_children = []
-                            for (var prop in data) {
-                                new_children.push({"Title":prop, "img-thumb":data[prop]});
-                            }
-                            // console.log(new_children);
-                            // console.log(newn)
-                            // console.log(root["children"][newn])
-                            root["children"][newn]["children"][newn2].children = new_children;
-                            // console.log(nodes)
-                            // root["children"][newn]["children"][newn2]["name"].children = [{"key":"value"}]
-                            // console.log(root["children"][newn]["children"][newn2]);
-                            // console.log(root)
-                        }
-                    }
-                }
-            } 
-                
-            
-           });
+              if (d["wiki-title"])
+                d3.select("#artifact-link").attr("href","https://en.wikipedia.org/wiki/" + d["wiki-title"].replace(/ /g,"_"))
+                    .html("Read More");
 
         })
-
-           
-
-
           .on( 'mouseenter', function() {
             // select element in current context
             d3.select( this )
@@ -255,14 +208,14 @@ function update() {
               .attr("height", 50)
               .attr("width", 50);
           });
-
+  
   // Append hero name on roll over next to the node as well
   nodeEnter.append("text")
       .attr("class", "nodetext")
       .attr("x", x_browser)
       .attr("y", y_browser +15)
       .attr("fill", tcBlack)
-      .text(function(d) { return d.Title; });
+      .text(function(d) { if (d.Title) {return d.Title} else {return d.name; }});
  
  
   // Exit any old nodes.
@@ -336,9 +289,44 @@ function nodeTransform(d) {
     if (d.children) {
       d._children = d.children;
       d.children = null;
+      
     } else {
       d.children = d._children;
       d._children = null;
+      if (d["wiki-title"]) {
+        $.ajax({
+            url: "https://rabbit-hole-backend.herokuapp.com/adjacent",
+            type: "post",
+            data: JSON.stringify({"title": d["wiki-title"]}) ,
+            contentType: 'application/json',
+            success: function (response) {
+                d.name = d.Title;
+                data = response
+                if (data != "An alternative method of recommendation is under development") {
+                    new_children = []
+                    for (var prop in data) {
+                        var im;
+                        if (data[prop] != null) {
+                            im = data[prop][0];
+                        }
+                        else {
+                            im = "https://agilitytoday.com/img/thumb_image_not_available.png"
+                        }
+                        new_children.push({"Title":prop, "img-thumb":im, "wiki-title":prop, "name":prop});
+                    }
+                    d.children = new_children;
+                }
+                
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+            }
+        });
+      }
+      else {
+          console.log("Incompatible node")
+      }
+      
     }
    
     update();
