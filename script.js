@@ -365,18 +365,19 @@ function nodeTransform(d) {
             success: function (response) {
                 d.name = d.Title;
                 data = response
-                console.log(data)
+                // console.log(data)
                 if (data != "An alternative method of recommendation is under development") {
                     new_children = []
                     for (var prop in data) {
                         var im;
                         if (data[prop] != null) {
-                            im = data[prop];
+                            im = data[prop]["img-thumb"];
+                            im2 = data[prop]["img-storage"]
                         }
                         else {
                             im = "https://agilitytoday.com/img/thumb_image_not_available.png"
                         }
-                        new_children.push({"Title":prop, "img-thumb":im, "wiki-title":prop, "name":prop});
+                        new_children.push({"Title":prop, "img-thumb":im, "wiki-title":prop, "name":prop, "img-storage": im2});
                     }
                     d.children = new_children;
                 }
