@@ -254,8 +254,9 @@ function update() {
   // Append hero name on roll over next to the node as well
   nodeEnter.append("text")
       .attr("class", "nodetext")
-      .attr("x", function(d) { if(d.Title) {return x_browser} else {return d.x}})
-      .attr("y", function(d) { if(d.Title) {return y_browser + 15} else {return d.x}})
+    //   .attr("class", function(d) { if (d.Title) {return "nodetext";} else {return "filternode"}})
+      .attr("x", x_browser)
+      .attr("y", y_browser+15)
       .attr("fill", tcBlack)
       .style("z-index", 6)
       .text(function(d) { if (d.Title) {return d.Title} else {return d.name; }});
@@ -328,7 +329,7 @@ function nodeTransform(d) {
    * Toggle children on click.
    */ 
   function click(d) {
-      // console.log(d.name)
+    //   console.log(d)
     if (d.children) {
       d._children = d.children;
       d.children = null;
@@ -356,19 +357,21 @@ function nodeTransform(d) {
       }
       if (d["wiki-title"]) {
         $.ajax({
-            url: "https://rabbit-hole-backend.herokuapp.com/adjacent",
-            type: "post",
-            data: JSON.stringify({"title": d["wiki-title"]}) ,
-            contentType: 'application/json',
+            url: "https://rabbit-hole-backend.herokuapp.com/adjacent?title=" + d["wiki-title"],
+            cache: false,
+            // type: "post",
+            // data: JSON.stringify({"title": d["wiki-title"]}) ,
+            // contentType: 'application/json',
             success: function (response) {
                 d.name = d.Title;
                 data = response
+                console.log(data)
                 if (data != "An alternative method of recommendation is under development") {
                     new_children = []
                     for (var prop in data) {
                         var im;
                         if (data[prop] != null) {
-                            im = data[prop][0];
+                            im = data[prop];
                         }
                         else {
                             im = "https://agilitytoday.com/img/thumb_image_not_available.png"

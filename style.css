@@ -7,7 +7,9 @@ path.link {
 .node:not(:hover) .nodetext {
   display: none;
 }
-
+.filternode {
+  display:block;
+}
 .active {
   fill: blue;
 }
