@@ -16,50 +16,47 @@ db.collection("Artifacts")
               
         });
     }
-    $('#filter').change(function() {
-        var filter_fields = []
-        var children = [];
-        selected_filter = $(this).val();
-        // console.log(selected_filter);
+    
+    var filter_fields = []
+    var children = [];
+    selected_filter = "Collection";
+    // console.log(selected_filter);
+    for (var artifact = 0; artifact < artifact_array.length; artifact++) {
+        if (typeof(artifact_array[artifact][selected_filter]) != typeof("nan")) {
+            artifact_array[artifact][selected_filter] = "NA";
+            
+        }
+        filter_fields.push(artifact_array[artifact][selected_filter])
+    }
+
+    // console.log(filter_fields);    
+    var unique_fields = filter_fields.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
+    // console.log(unique_fields);
+    for (var name = 0; name < unique_fields.length; name++) {
+
+        var child_artifacts = []
         for (var artifact = 0; artifact < artifact_array.length; artifact++) {
-            if (typeof(artifact_array[artifact][selected_filter]) != typeof("nan")) {
-                artifact_array[artifact][selected_filter] = "NA";
-                
+            if (artifact_array[artifact][selected_filter] == unique_fields[name]) {
+                child_artifacts.push(artifact_array[artifact])
             }
-            filter_fields.push(artifact_array[artifact][selected_filter])
         }
-    
-        // console.log(filter_fields);    
-        var unique_fields = filter_fields.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
-        // console.log(unique_fields);
-        for (var name = 0; name < unique_fields.length; name++) {
-    
-            var child_artifacts = []
-            for (var artifact = 0; artifact < artifact_array.length; artifact++) {
-                if (artifact_array[artifact][selected_filter] == unique_fields[name]) {
-                    child_artifacts.push(artifact_array[artifact])
-                }
-            }
-            var child_json = {
-                "name" : unique_fields[name],
-                "children" : child_artifacts,
-                "parent" : "CSMVS"
-            }
-            // console.log(child_json)
-            children.push(child_json)
+        var child_json = {
+            "name" : unique_fields[name],
+            "children" : child_artifacts,
+            "parent" : "CSMVS"
         }
-        // console.log(children);
-        var artifact_json = {
-            // "_children": null,
-            "name": "CSMVS",
-            "img-thumb": "https://career.webindia123.com/career/institutes/aspupload/Uploads/all-states/18914/logo.jpg",
-            "children": children
-        }
-        // console.log(artifact_json)
-        createGraph(artifact_json);
-        
-    });
-    
+        // console.log(child_json)
+        children.push(child_json)
+    }
+    // console.log(children);
+    var artifact_json = {
+        // "_children": null,
+        "name": "CSMVS",
+        "img-thumb": "https://career.webindia123.com/career/institutes/aspupload/Uploads/all-states/18914/logo.jpg",
+        "children": children
+    }
+    // console.log(artifact_json)
+    createGraph(artifact_json);
     // $('#filter').value = "Collection"
 })
 .catch(function(error) {
@@ -88,6 +85,50 @@ var force = d3.layout.force();
 
  var vis = svg.append("svg:g")
                 .attr("overflow","visible")
+
+$('#filter').change(function() {
+    var filter_fields = []
+    var children = [];
+    selected_filter = $(this).val();
+    // console.log(selected_filter);
+    for (var artifact = 0; artifact < artifact_array.length; artifact++) {
+        if (typeof(artifact_array[artifact][selected_filter]) != typeof("nan")) {
+            artifact_array[artifact][selected_filter] = "NA";
+            
+        }
+        filter_fields.push(artifact_array[artifact][selected_filter])
+    }
+
+    // console.log(filter_fields);    
+    var unique_fields = filter_fields.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
+    // console.log(unique_fields);
+    for (var name = 0; name < unique_fields.length; name++) {
+
+        var child_artifacts = []
+        for (var artifact = 0; artifact < artifact_array.length; artifact++) {
+            if (artifact_array[artifact][selected_filter] == unique_fields[name]) {
+                child_artifacts.push(artifact_array[artifact])
+            }
+        }
+        var child_json = {
+            "name" : unique_fields[name],
+            "children" : child_artifacts,
+            "parent" : "CSMVS"
+        }
+        // console.log(child_json)
+        children.push(child_json)
+    }
+    // console.log(children);
+    var artifact_json = {
+        // "_children": null,
+        "name": "CSMVS",
+        "img-thumb": "https://career.webindia123.com/career/institutes/aspupload/Uploads/all-states/18914/logo.jpg",
+        "children": children
+    }
+    // console.log(artifact_json)
+    createGraph(artifact_json);
+    
+});
 
 function createGraph(artifact_json) {
          root = artifact_json;
@@ -169,8 +210,9 @@ function update() {
         .attr("y", function(d) { return -25;})
         .attr("height", 50)
         .attr("width", 50)
-        .style("z-index", function(d) { if (d.name=="CSMVS") { return 5 }});
+        .style("z-index", 5);
   
+
   // make the image grow a little on mouse over and add the text details on click
   var setEvents = images
           // Append hero text
@@ -180,11 +222,11 @@ function update() {
               d3.select("#artifact-thumb-image").attr("src",d["img-thumb"]);
               d3.select("#artifact-full-image").attr("src",d["img-storage"]);
               d3.select("#artifact-title").html(d.Title);
-              d3.select("#artifact-provenance").html(d.Provenance);
-              d3.select("#artifact-period").html(d.Period); 
-              d3.select("#artifact-short-description").html(d["Short Description"]);
-              d3.select("#artifact-display-status").html(d["Display Status"]);
-              d3.select("#artifact-long-description").html(d["Long Description"]); 
+              createCard("#artifact-provenance", d.Provenance);
+              createCard("#artifact-period" , d.Period); 
+              createCard("#artifact-short-description" , d["Short Description"]);
+              createCard("#artifact-display-status" , d["Display Status"]);
+              createCard("#artifact-long-description" , d["Long Description"]); 
               if (d["wiki-title"])
                 d3.select("#artifact-link").attr("href","https://en.wikipedia.org/wiki/" + d["wiki-title"].replace(/ /g,"_"))
                     .html("Read More");
@@ -212,9 +254,10 @@ function update() {
   // Append hero name on roll over next to the node as well
   nodeEnter.append("text")
       .attr("class", "nodetext")
-      .attr("x", x_browser)
-      .attr("y", y_browser +15)
+      .attr("x", function(d) { if(d.Title) {return x_browser} else {return d.x}})
+      .attr("y", function(d) { if(d.Title) {return y_browser + 15} else {return d.x}})
       .attr("fill", tcBlack)
+      .style("z-index", 6)
       .text(function(d) { if (d.Title) {return d.Title} else {return d.name; }});
  
  
@@ -293,6 +336,24 @@ function nodeTransform(d) {
     } else {
       d.children = d._children;
       d._children = null;
+      if (!d["Display Status"]) {
+        $.ajax({
+            url: "https://rabbit-hole-backend.herokuapp.com/current",
+            type: "post",
+            data: JSON.stringify({"title": d["wiki-title"]}) ,
+            contentType: 'application/json',
+            success: function (response) {
+                d.name = d.Title;
+                data = response
+                d["Long Description"] = response["summary"]
+                createCard("#artifact-long-description" ,d["Long Description"]);
+                
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+            }
+        });
+      }
       if (d["wiki-title"]) {
         $.ajax({
             url: "https://rabbit-hole-backend.herokuapp.com/adjacent",
@@ -326,6 +387,7 @@ function nodeTransform(d) {
       else {
           console.log("Incompatible node")
       }
+      
       
     }
    
@@ -364,4 +426,21 @@ document.getElementById("close-button").addEventListener("click",function() {
 });
 
     
-
+function createCard(ctag, ccontent) {
+    if (ccontent) {
+        d3.select(ctag).select(function() {return this.parentNode;})
+                .select(function() {return this.parentNode;})
+                .select(function() {return this.parentNode;})
+                .classed("hidden", false);
+        d3.select(ctag).html(ccontent);
+    }
+    else {
+        d3.select(ctag).select(function() {return this.parentNode;})
+        .select(function() {return this.parentNode;})
+        .select(function() {return this.parentNode;})
+        .classed("hidden", true);
+    }
+    
+    // d3.select("#content").append("div").attr("class", "card-body") 
+    //                      .append("a").attr("class", "href-link").attr("href", clink)              
+}

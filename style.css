@@ -22,3 +22,7 @@ a:link { color: #EE3124; text-decoration: none;}
 a:visited { color: #EE3124; }
 a:hover { color: #A4CD39; text-decoration: underline;}
 a:active { color: #EE3124; }
+
+.hidden {
+  display: none;
+}
