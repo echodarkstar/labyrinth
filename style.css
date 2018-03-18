@@ -39,13 +39,20 @@ span {
 #modal-content {
   text-align: center;
 }
+
+.list-group, .list-group-item {
+  background-color: #343a40!important;
+}
+/* #read-more {
+  position: absolute;
+} */
 .modal-backdrop {
 
   background-color: rgba(0,0,0,.0001) !important;
 }
 h1 { font-size: 36px; margin: 10px 0; text-transform: uppercase; font-weight: normal;}
 h2, h3 { font-size: 18px; margin: 5px 0 ; font-weight: normal;}
-#content {display:none; position: absolute; top: 0; left: 0; z-index: 5; overflow: scroll; height: 100vh; margin-left: 75vw}
+#content {display:none; position: absolute; top: 0; left: 0; z-index: 5; overflow: scroll;overflow-x: hidden; height: 100vh; margin-left: 75vw}
 .card-body, .list-group-item {padding: 5px; width: 25vw}
 .card-img-top {width: auto;}
 .image-container{vertical-align: middle; text-align: center; padding: 2vh}
