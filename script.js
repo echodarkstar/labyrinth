@@ -70,7 +70,7 @@ var tcBlack = "#130C0E";
 
 // rest of vars
 var w = window.innerWidth,
-    h = window.innerHeight,
+    h = window.innerHeight ,
     x_browser = 20,
     y_browser = 25;
 var count = true;
@@ -172,7 +172,7 @@ function update() {
     path.enter().insert("svg:path")
       .attr("class", "link")
       // .attr("marker-end", "url(#end)")
-      .style("stroke", "#eee");
+      .style("stroke", "#ccc");
  
  
   // Exit any old paths.
@@ -193,7 +193,7 @@ function update() {
       .attr("class", "node active")
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
       .on("click.enter", click)
-      .on("click.center", clicked)
+    //   .on("click.center", clicked)
       .call(force.drag);
       
       
@@ -201,7 +201,7 @@ function update() {
   // Append a circle
   nodeEnter.append("svg:circle")
       .attr("r", function(d) { return 10; })
-      .style("fill", "#eee"); 
+      .style("fill", "#ccc"); 
    
   // Append images
   var images = nodeEnter.append("svg:image")
@@ -447,3 +447,7 @@ function createCard(ctag, ccontent) {
     // d3.select("#content").append("div").attr("class", "card-body") 
     //                      .append("a").attr("class", "href-link").attr("href", clink)              
 }
+
+$(window).on('load',function(){
+    $('#myModal').modal('show');
+});

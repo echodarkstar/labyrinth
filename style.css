@@ -14,6 +14,35 @@ path.link {
   fill: blue;
 }
 
+@font-face {
+  font-family: "Aller";
+  src: url(assets/fonts/Aller_Rg.ttf) format("truetype");
+}
+body {
+  font-family: "Aller", Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+span {
+  text-align: center;
+  font-size: 200%;
+  text-decoration-color: aqua;
+  padding: 2vh;
+}
+
+.form-control {
+  width: auto !important;
+  position: absolute !important;
+}
+
+#modal-content {
+  text-align: center;
+}
+.modal-backdrop {
+
+  background-color: rgba(0,0,0,.0001) !important;
+}
 h1 { font-size: 36px; margin: 10px 0; text-transform: uppercase; font-weight: normal;}
 h2, h3 { font-size: 18px; margin: 5px 0 ; font-weight: normal;}
 #content {display:none; position: absolute; top: 0; left: 0; z-index: 5; overflow: scroll; height: 100vh; margin-left: 75vw}
